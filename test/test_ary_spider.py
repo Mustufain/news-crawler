@@ -2,7 +2,7 @@ import os
 import unittest
 from news_crawler.spiders.ary_spider import AryNewsSpider
 import datetime
-from news_crawler.test.utils import fake_response
+from .utils import fake_response
 from unittest.mock import patch, mock_open
 
 

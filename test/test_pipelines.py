@@ -4,7 +4,7 @@ from news_crawler.items import NewsItem
 from news_crawler.pipelines import NewsTextPipeline, \
     NewsPlaceMentionedPipeline, DropEmptyRequiredFieldsPipeline, \
     DuplicatesPipeline, MongoPipeline
-from news_crawler.test.utils import fake_response, read_file
+from .utils import fake_response, read_file
 import mock
 from nose.tools import raises
 
