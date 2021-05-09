@@ -18,15 +18,13 @@ class NewsTextPipelineTest(unittest.TestCase):
         self.pipeline = NewsTextPipeline()
         self.item = NewsItem()
 
-    @mock.patch('news_crawler.pipelines.requests.get')
-    def test_process_item(self, mock_get):
-        mock_get.return_value = self.news_response
-        self.item['url'] = 'https://example.com'
+    def test_process_item(self):
+        self.item['text'] = self.news_response.text
         news = self.pipeline.process_item(self.item, self.spider)
         text = read_file('data/news_text.txt')
         self.assertEqual(news['text'], text)
 
-        mock_get.return_value = self.sports_response
+        self.item['text'] = self.sports_response.text
         sports = self.pipeline.process_item(self.item, self.spider)
         text = read_file('data/sports_text.txt')
         self.assertEqual(sports['text'], text)

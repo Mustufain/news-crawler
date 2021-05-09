@@ -11,8 +11,6 @@ from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 from readability import Document
 from geograpy import extraction
-from news_crawler.utils import if_tagger_exists, if_tokenizer_exists, \
-    if_chunker_exists, if_corpora_exists
 import html2text
 import logging
 
@@ -25,7 +23,7 @@ class NewsTextPipeline:
     def process_item(self, item, spider):
         try:
             adapter = ItemAdapter(item)
-            doc = Document(requests.get(adapter['url']).text)
+            doc = Document(adapter['text'])
             content = Document(doc.content()).summary()
             h = html2text.HTML2Text()
             h.ignore_links = True
@@ -51,10 +49,6 @@ class NewsPlaceMentionedPipeline:
 
     def process_item(self, item, spider):
         try:
-            if_tokenizer_exists()
-            if_tagger_exists()
-            if_chunker_exists()
-            if_corpora_exists()
             adapter = ItemAdapter(item)
             extractor = extraction.Extractor(url=adapter['url'])
             extractor.find_geoEntities()
@@ -125,6 +119,7 @@ class MongoPipeline:
 
     def process_item(self, item, spider):
         self.insert(item)
+        logging.info('news post url' + item['url'])
         logging.info('news posts added to MongoDB')
         return item
 

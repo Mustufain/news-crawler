@@ -1,15 +1,17 @@
 import os
-import datetime
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from news_crawler.items import NewsItem
+from bs4 import BeautifulSoup
+from news_crawler.spiders.spider_helpers import is_article, \
+    get_posted_date, get_news_headline, get_news_author
 
 
 class AryNewsSpider(CrawlSpider):
     name = "ary"
     rules = [Rule(
         LinkExtractor(
-            deny=['category/', 'author/', 'videos.arynews.tv']
+            allow=["arynews.tv/en/*", "https://arysports.tv/*"]  # only such urls
         ),
         callback='parse_items',
         follow=True
@@ -22,57 +24,10 @@ class AryNewsSpider(CrawlSpider):
     def __init__(self):
 
         self.urls_visited = []
-        self.filename = os.path.join(os.getcwd(), 'spiders/url_visited.txt')
-        self.posted_date_xpath = '//time[@class="post-published updated"]/b/text()'
-        self.author_xpath = '//a[@class="author url fn"]/text()'
-        self.title_xpath = '/html/head/title/text()'
-        self.post_xpath = '//div[@class="post-header post-tp-1-header"]'
-        self.start_urls = ['http://arynews.tv']
+        self.filename = os.path.join(os.getcwd(), 'news_crawler/spiders/url_visited.txt')
+        # self.author_regex = r">([^<]*)</a>"
+        self.start_urls = ['https://arynews.tv/en']
         super().__init__()
-
-    def get_news_headline(self, response):
-        """
-
-        :param response:
-        :return:
-        """
-        title = response.xpath(self.title_xpath).get()
-        return title
-
-    def get_news_author(self, response):
-        """
-
-        :param response:
-        :return:
-        """
-        author = response.xpath(self.author_xpath).get()
-        if author:
-            return author.strip()
-        else:
-            return ''
-
-    def get_posted_date(self, response):
-        """
-
-        :param response:
-        :return:
-        """
-        date_str = response.xpath(self.posted_date_xpath).get()
-        if date_str:
-            posted_date = self.parse_date(date_str)
-            return posted_date
-        else:
-            return ''
-
-    @staticmethod
-    def parse_date(date_str):
-        """
-
-        :param date_str:
-        :return:
-        """
-        posted_date = datetime.datetime.strptime(date_str, '%b %d, %Y').date()
-        return posted_date
 
     def get_visited_urls(self):
         """
@@ -92,15 +47,21 @@ class AryNewsSpider(CrawlSpider):
         :param response:
         """
         self.get_visited_urls()
-        exists = response.xpath(self.post_xpath).extract_first()
-        if exists:  # if post exists
+        soup = BeautifulSoup(response.text, 'lxml')
+        article_exists = is_article(soup)
+        if article_exists:
             if response.url not in self.urls_visited:
                 # scrapping logic here
                 news_item = NewsItem()
                 news_item['url'] = response.url
-                news_item['author'] = self.get_news_author(response)
-                news_item['posted_date'] = self.get_posted_date(response)
-                headline = self.get_news_headline(response)
+                news_item['text'] = response.text
+                author = get_news_author(soup)
+                posted_date = get_posted_date(soup)
+                headline = get_news_headline(soup)
+                if author:
+                    news_item['author'] = author
+                if posted_date:
+                    news_item['posted_date'] = posted_date
                 if headline:
                     news_item['headline'] = headline
                 # append url to file
