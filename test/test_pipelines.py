@@ -37,11 +37,13 @@ class NewsPlaceMentionedPipelineTest(unittest.TestCase):
         self.pipeline = NewsPlaceMentionedPipeline()
         self.item = NewsItem()
 
-    def test_process_item(self):
+    @mock.patch('geograpy.extraction.Extractor')
+    def test_process_item(self, mock_extractor):
+        mock_extractor.return_value.places = ['Islamabad']
         self.item['url'] = 'https://arynews.tv/en/imran-khan-labour-day-workers/'
         item = self.pipeline.process_item(self.item, self.spider)
-        assert item is not None
-        self.assertEqual(['ISLAMABAD', 'Pakistan'], sorted(item['places_mentioned']))
+        self.assertTrue(mock_extractor.return_value.find_geoEntities.called)
+        self.assertEqual(item['places_mentioned'], ['Islamabad'])
 
 
 class DropEmptyRequiredFieldsPipelineTest(unittest.TestCase):
