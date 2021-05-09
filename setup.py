@@ -17,6 +17,7 @@ setup(
     version=VERSION,
     packages=find_packages(exclude=['test']),
     author="abbasmustufain@gmail.com",
+    python_requires='>=3.6',
     entry_points={'console_scripts': [
         'news_crawler = news_crawler:main']},
     include_package_data=True

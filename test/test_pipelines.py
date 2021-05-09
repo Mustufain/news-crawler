@@ -37,7 +37,7 @@ class NewsPlaceMentionedPipelineTest(unittest.TestCase):
         self.pipeline = NewsPlaceMentionedPipeline()
         self.item = NewsItem()
 
-    def test_process_items_exception(self):
+    def test_process_item(self):
         self.item['url'] = 'https://arynews.tv/en/imran-khan-labour-day-workers/'
         item = self.pipeline.process_item(self.item, self.spider)
         assert item is not None

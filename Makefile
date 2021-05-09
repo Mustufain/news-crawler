@@ -12,7 +12,9 @@ clean:
 test: .virtualenv
 	(. .virtualenv/bin/activate; \
 	pycodestyle --max-line-length=79 news_crawler test; \
-	nosetests test --with-coverage --cover-tests --cover-min-percentage=80 --cover-package=news_crawler)
+	pylint news_crawler --rcfile=pylintrc; \
+	pylint test --rcfile=pylintrc-test; \
+	nosetests test --with-coverage --cover-tests --cover-min-percentage=90 --cover-package=news_crawler)
 
 build: test
 

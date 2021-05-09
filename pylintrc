@@ -1,0 +1,55 @@
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma
+good-names=i,j,k,e,_
+
+# Private entries do not need documentation
+# Yes, private entries must be marked with a single not a double underscore
+no-docstring-rgx=_.*
+
+[FORMAT]
+
+# we follow a genral practice
+max-line-length=79
+
+[MESSAGES CONTROL]
+
+# I0011 - locally disabling ...
+# If a pylint message is locally disabled - there is a reason for it. There is no need
+# To show a warning
+
+# C0203 - Metaclass method ... should have 'cls' as first argument
+# pep8 says otherwise - lets stick with pep8 here
+
+# R1705 - no-else-return] Unnecessary "else" after "return"
+# Sometimes else at the end looks clearer, let's allow this.
+
+disable=I0011, C0203, R1705
+
+[REPORTS]
+
+# set the output format. Available formats are text, parseable, colorized and html
+output-format=text
+
+# reasonable message template
+msg-template=@{line}: [{msg_id} {symbol}] {msg}
+
+[MASTER]
+
+# given that numpy is a C extension it has to be white-listed
+# same goes for MySQLdb exceptions
+extension-pkg-whitelist=numpy,MySQLdb
+
+[TYPECHECK]
+
+# numpy has a bunch of dynamically created fields invisible for pylint
+# they need to be ignored
+ignored-modules = numpy
+ignored-classes = numpy
+
+[SIMILARITIES]
+# Ignore similar imports, see:
+# https://stackoverflow.com/questions/29206482/pylint-duplicate-code-false-positive
+# It is better to disable this on imports, than on the whole file because
+# of required imports.
+ignore-imports=yes
