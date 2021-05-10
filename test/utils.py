@@ -21,7 +21,6 @@ def read_file(file_name):
             file_path = os.path.join(responses_dir, file_name)
         else:
             file_path = file_name
-
         file_content = open(file_path).read()
     else:
         file_content = ''

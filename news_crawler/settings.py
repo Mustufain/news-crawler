@@ -100,5 +100,6 @@ ITEM_PIPELINES = {
 MONGODB_USERNAME = urllib.parse.quote_plus("mustufain")
 MONGODB_PWD = urllib.parse.quote_plus("mongo@!123")
 MONGODB_URI = f"mongodb+srv://{MONGODB_USERNAME}:{MONGODB_PWD}" \
-              f"@news-scraper.a2rmv.mongodb.net/ary_news?retryWrites=true&w=majority"
+              f"@news-scraper.a2rmv.mongodb.net/" \
+              f"ary_news?retryWrites=true&w=majority"
 MONGODB_DB = 'ary_news'

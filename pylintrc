@@ -39,6 +39,7 @@ msg-template=@{line}: [{msg_id} {symbol}] {msg}
 # given that numpy is a C extension it has to be white-listed
 # same goes for MySQLdb exceptions
 extension-pkg-whitelist=numpy,MySQLdb
+ignore=middlewares.py
 
 [TYPECHECK]
 
