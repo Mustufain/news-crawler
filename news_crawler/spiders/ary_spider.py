@@ -1,10 +1,11 @@
-import os
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from news_crawler.items import NewsItem
 from bs4 import BeautifulSoup
+
+from news_crawler.items import NewsItem
 from news_crawler.spiders.spider_helpers import is_article, \
-    get_posted_date, get_news_headline, get_news_author
+    get_posted_date, get_news_headline, get_news_author, \
+    get_time_tag, get_visited_urls
 
 
 class AryNewsSpider(CrawlSpider):
@@ -24,51 +25,36 @@ class AryNewsSpider(CrawlSpider):
 
     def __init__(self):
 
-        self.urls_visited = []
-        self.filename = os.path.join(
-            os.getcwd(), 'news_crawler/spiders/url_visited.txt')
-        # self.author_regex = r">([^<]*)</a>"
         self.start_urls = ['https://arynews.tv/en']
         super().__init__()
-
-    def get_visited_urls(self):
-        """
-
-        :return:
-        """
-        try:
-            with open(self.filename) as urls:
-                self.urls_visited = urls.read().splitlines()
-        except FileNotFoundError:
-            # File not found, it means we are scraping for the first time
-            pass
 
     def parse_items(self, response):
         """
 
         :param response:
         """
-        self.get_visited_urls()
+        urls_visited = get_visited_urls()
         soup = BeautifulSoup(response.text, 'lxml')
         article_exists = is_article(soup)
         if article_exists:
-            if response.url not in self.urls_visited:
+            if response.url not in urls_visited:
                 # scrapping logic here
                 news_item = NewsItem()
                 news_item['url'] = response.url
                 news_item['text'] = response.text
-                author = get_news_author(soup)
-                posted_date = get_posted_date(soup)
-                headline = get_news_headline(soup)
-                if author:
-                    news_item['author'] = author
-                if posted_date:
+                anchor_tag = get_news_author(soup)
+                time_tag = get_time_tag(soup)
+                title_tag = get_news_headline(soup)
+                # if anchor tag is found
+                if anchor_tag:
+                    news_item['author'] = anchor_tag.text
+                # if time tag is found
+                if time_tag:
+                    posted_date = get_posted_date(time_tag)
                     news_item['posted_date'] = posted_date
-                if headline:
-                    news_item['headline'] = headline
-                # append url to file
-                with open(self.filename, "a") as urls_visited:
-                    urls_visited.write(response.url + "\n")
+                # if title tag is found
+                if title_tag:
+                    news_item['headline'] = title_tag.text
                 yield news_item
             else:
                 self.logger.info(

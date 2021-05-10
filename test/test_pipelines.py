@@ -1,12 +1,12 @@
 import unittest
+import mock
 from scrapy.spiders import Spider
+from nose.tools import raises
 from news_crawler.items import NewsItem
 from news_crawler.pipelines import NewsTextPipeline, \
     NewsPlaceMentionedPipeline, DropEmptyRequiredFieldsPipeline, \
     DuplicatesPipeline, MongoPipeline
 from .utils import fake_response, read_file
-import mock
-from nose.tools import raises
 
 
 class NewsTextPipelineTest(unittest.TestCase):
@@ -40,7 +40,7 @@ class NewsPlaceMentionedPipelineTest(unittest.TestCase):
     @mock.patch('geograpy.extraction.Extractor')
     def test_process_item(self, mock_extractor):
         mock_extractor.return_value.places = ['Islamabad']
-        self.item['url'] = 'https://arynews.tv/en/imran-khan-labour-day-workers/'
+        self.item['url'] = 'https://example.com'
         item = self.pipeline.process_item(self.item, self.spider)
         self.assertTrue(mock_extractor.return_value.find_geoEntities.called)
         self.assertEqual(item['places_mentioned'], ['Islamabad'])

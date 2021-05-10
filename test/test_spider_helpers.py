@@ -1,35 +1,39 @@
 import datetime
 import unittest
-from .utils import fake_response
+import mock
 from bs4 import BeautifulSoup
 from news_crawler.spiders.spider_helpers import is_article, \
     get_posted_date, get_news_headline, \
-    parse_date, get_news_author
+    get_time_tag, get_news_author, get_visited_urls
+from .utils import fake_response
 
 
 class SpiderHelpers(unittest.TestCase):
     def setUp(self):
         self.date_str = 'May 4, 2018'
-        self.news_soup = BeautifulSoup(fake_response('data/news.html').text, 'lxml')
-        self.sports_soup = BeautifulSoup(fake_response('data/sports.html').text, 'lxml')
-        self.invalid_soup = BeautifulSoup(fake_response('data/invalid_response.html').text, 'lxml')
+        self.news_soup = BeautifulSoup(
+            fake_response('data/news.html').text, 'lxml')
+        self.sports_soup = BeautifulSoup(
+            fake_response('data/sports.html').text, 'lxml')
+        self.invalid_soup = BeautifulSoup(
+            fake_response('data/invalid_response.html').text, 'lxml')
 
-    def test_parse_date(self):
-        posted_date = parse_date(self.date_str)
-        target_date = datetime.datetime(2018, 5, 4)
-        self.assertEqual(posted_date, target_date)
+    def test_get_time_tag(self):
+        news_time_tag = get_time_tag(self.news_soup)
+        sports_time_tag = get_time_tag(self.sports_soup)
+        invalid_time_tag = get_time_tag(self.invalid_soup)
+        assert news_time_tag is not None
+        assert sports_time_tag is not None
+        assert invalid_time_tag is None
 
-    def test_get_posted_date(self):
-        posted_date = get_posted_date(self.news_soup)
+    def test_get_news_posted_date(self):
+        posted_date = get_posted_date(self.news_soup.find('time'))
         self.assertEqual(posted_date, datetime.datetime(2021, 5, 4))
 
     def test_get_sports_posted_date(self):
-        posted_date = get_posted_date(self.sports_soup)
-        self.assertEqual(posted_date, datetime.datetime(2021, 5, 5))
 
-    def test_empty_posted_date(self):
-        posted_date = get_posted_date(self.invalid_soup)
-        assert posted_date is None
+        posted_date = get_posted_date(self.sports_soup.find('time'))
+        self.assertEqual(posted_date, datetime.datetime(2021, 5, 5))
 
     def test_get_news_headline(self):
         news_headline = get_news_headline(self.news_soup)
@@ -49,13 +53,18 @@ class SpiderHelpers(unittest.TestCase):
         assert article is False
 
     def test_get_news_author(self):
-        author = get_news_author(self.news_soup)
-        self.assertEqual(author, 'Web Desk')
+        anchor_tag = get_news_author(self.news_soup)
+        self.assertEqual(anchor_tag.text, 'Web Desk')
 
     def test_get_sports_news_author(self):
-        author = get_news_author(self.sports_soup)
-        self.assertEqual(author, 'Shoaib Jatt')
+        anchor_tag = get_news_author(self.sports_soup)
+        self.assertEqual(anchor_tag.text, 'Shoaib Jatt')
 
     def test_get_empty_news_author(self):
-        author = get_news_author(self.invalid_soup)
-        assert author is None
+        anchor_tag = get_news_author(self.invalid_soup)
+        assert anchor_tag is None
+
+    @mock.patch("pymongo.MongoClient")
+    def test_get_visited_urls(self, mock_pymongo):
+        get_visited_urls()
+        self.assertTrue(mock_pymongo.called)

@@ -1,30 +1,41 @@
 import datetime
 import re
+from bs4 import BeautifulSoup
+from scrapy.utils.project import get_project_settings
+import pymongo
 
 
-def get_news_headline(soup_text):
+def get_news_headline(soup_text: BeautifulSoup) -> BeautifulSoup:
     """
 
     :param soup_text:
     :return:
     """
     title = soup_text.find('title')
-    if title:
-        return title.string
+    return title
 
 
-def parse_date(date_str):
+def get_posted_date(time_tag: BeautifulSoup) -> datetime:
     """
 
-    :param date_str:
+    :param time_tag:
     :return:
     """
-    # pymongo uses datetime.datetime objects for representing dates in mongo docs
-    posted_date = datetime.datetime.strptime(date_str, '%b %d, %Y')
+    # 2 cases, either date text is inside <b> tag or it is not.
+    # we have to handle both cases here
+    b_tag = time_tag.find('b')
+    if b_tag:
+        date_str = b_tag.text.strip()
+    else:
+        date_str = time_tag.text.strip()
+    # pymongo uses datetime.datetime objects
+    # for representing dates in mongo docs
+    posted_date = datetime.datetime.strptime(
+        date_str, '%b %d, %Y')
     return posted_date
 
 
-def is_article(soup_text):
+def is_article(soup_text: BeautifulSoup) -> bool:
     """
 
     :param soup_text:
@@ -33,40 +44,39 @@ def is_article(soup_text):
     article = soup_text.find_all('article')
     # if its a page with new article, it should contain
     # only one <article> tag
-    if len(article) == 1:
-        return True
-    else:
-        return False
+    return bool(len(article) == 1)
 
 
-def get_posted_date(soup_text):
+def get_time_tag(soup_text: BeautifulSoup) -> datetime:
     """
 
     :param soup_text:
     :return:
     """
     time_tag = soup_text.find('time')
-    # 2 cases, either date text is inside <b> tag or it is not.
-    # we have to handle both cases here
-    if time_tag:
-        b_tag = time_tag.find('b')
-        if b_tag:
-            posted_date_str = b_tag.text.strip()
-            posted_date = parse_date(posted_date_str)
-        else:
-            posted_date_str = time_tag.text.strip()
-            posted_date = parse_date(posted_date_str)
-        return posted_date
+    return time_tag
 
 
-def get_news_author(soup_text):
+def get_news_author(soup_text: BeautifulSoup) -> BeautifulSoup:
     """
 
     :param soup_text:
     :return:
     """
     # author has link of pattern https://author/
-    anchor_tag = soup_text.find('a', href=re.compile("https:.*/author/.*"))
-    if anchor_tag:
-        author = anchor_tag.text
-        return author
+    anchor_tag = soup_text.find(
+        'a', href=re.compile("https:.*/author/.*"))
+    return anchor_tag
+
+
+def get_visited_urls() -> list:
+    url_visited = []
+    settings = get_project_settings()
+    uri = settings['MONGODB_URI']
+    database = settings['MONGODB_DB']
+    mongo_client = pymongo.MongoClient(uri)
+    mongo_db = mongo_client[database]
+    for row in mongo_db['news_articles'].find(
+            {}, {"_id": 0, "url": 1}):
+        url_visited.append(row['url'])
+    return url_visited
