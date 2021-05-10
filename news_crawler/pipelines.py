@@ -1,18 +1,10 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
+import logging
 import pymongo
-
-# useful for handling different item types with a single interface
-import requests
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 from readability import Document
 from geograpy import extraction
 import html2text
-import logging
 
 
 class NewsTextPipeline:
@@ -25,10 +17,10 @@ class NewsTextPipeline:
             adapter = ItemAdapter(item)
             doc = Document(adapter['text'])
             content = Document(doc.content()).summary()
-            h = html2text.HTML2Text()
-            h.ignore_links = True
-            h.ignore_images = True
-            news_text = h.handle(content)
+            html_text = html2text.HTML2Text()
+            html_text.ignore_links = True
+            html_text.ignore_images = True
+            news_text = html_text.handle(content)
             news_text = news_text.replace("\\n", " ").\
                 replace("\n", " ").\
                 replace("\r", " ").\
@@ -114,17 +106,17 @@ class MongoPipeline:
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(self.mongo_uri)
-        self.db = self.client[self.mongo_db]
+        self.database = self.client[self.mongo_db]
 
     def close_spider(self, spider):
         self.client.close()
 
     def process_item(self, item, spider):
         self.insert(item)
-        logging.info('news post url' + item['url'])
+        logging.info('news post url %s', item['url'])
         logging.info('news posts added to MongoDB')
         return item
 
     def insert(self, item):
-        collection = self.db[self.collection_name]
+        collection = self.database[self.collection_name]
         collection.insert_one(ItemAdapter(item).asdict())
