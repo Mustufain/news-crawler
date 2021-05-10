@@ -60,6 +60,7 @@ msg-template=@{line}: [{msg_id} {symbol}] {msg}
 
 # given that numpy is a C extension it has to be white-listed
 extension-pkg-whitelist=numpy
+fail_under=9
 
 [TYPECHECK]
 

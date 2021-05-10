@@ -9,7 +9,7 @@ no-docstring-rgx=_.*
 
 [FORMAT]
 
-# we follow a genral practice
+# we follow a general practice
 max-line-length=79
 
 [MESSAGES CONTROL]
@@ -24,7 +24,7 @@ max-line-length=79
 # R1705 - no-else-return] Unnecessary "else" after "return"
 # Sometimes else at the end looks clearer, let's allow this.
 
-disable=I0011, C0203, R1705
+disable=I0011, C0203, R1705, R0801, C0116, C0114, C0115
 
 [REPORTS]
 

@@ -11,7 +11,8 @@ class AryNewsSpider(CrawlSpider):
     name = "ary"
     rules = [Rule(
         LinkExtractor(
-            allow=["arynews.tv/en/*", "https://arysports.tv/*"]  # only such urls
+            allow=["arynews.tv/en/*",
+                   "https://arysports.tv/*"]  # only such urls
         ),
         callback='parse_items',
         follow=True
@@ -24,7 +25,8 @@ class AryNewsSpider(CrawlSpider):
     def __init__(self):
 
         self.urls_visited = []
-        self.filename = os.path.join(os.getcwd(), 'news_crawler/spiders/url_visited.txt')
+        self.filename = os.path.join(
+            os.getcwd(), 'news_crawler/spiders/url_visited.txt')
         # self.author_regex = r">([^<]*)</a>"
         self.start_urls = ['https://arynews.tv/en']
         super().__init__()
@@ -69,6 +71,10 @@ class AryNewsSpider(CrawlSpider):
                     urls_visited.write(response.url + "\n")
                 yield news_item
             else:
-                self.logger.info('url %s has already been visited', response.url)
+                self.logger.info(
+                    'url %s has already been visited',
+                    response.url)
         else:
-            self.logger.info('url %s does not contain news post', response.url)
+            self.logger.info(
+                'url %s does not contain news post',
+                response.url)

@@ -21,7 +21,8 @@ class AryNewsSpiderTest(unittest.TestCase):
 
     def test_get_visited_urls(self):
         base_path = os.getcwd()
-        file_path = os.path.join(base_path, 'test/data/test_url_visited.txt')
+        file_path = os.path.join\
+            (base_path, 'test/data/test_url_visited.txt')
         self.spider.filename = file_path
         self.spider.get_visited_urls()
         self.assertEqual(len(self.spider.urls_visited), 3)
@@ -30,20 +31,24 @@ class AryNewsSpiderTest(unittest.TestCase):
         with patch('builtins.open', new_callable=mock_open()) as m:
             item = next(self.spider.parse_items(self.news_response))
             # simple assertion that your open was called with append
-            file = os.path.join(os.getcwd(), 'news_crawler/spiders/url_visited.txt')
+            file = os.path.join(
+                os.getcwd(), 'news_crawler/spiders/url_visited.txt')
             m.assert_called_with(file, 'a')
             self.assertEqual(item['url'], 'http://www.example.com')
             self.assertEqual(item['author'], 'Web Desk')
-            self.assertEqual(item['posted_date'], datetime.datetime(2021, 5, 4))
+            self.assertEqual(item['posted_date'],
+                             datetime.datetime(2021, 5, 4))
             assert item['headline'] is not None
 
     def test_parse_sports_items(self):
         with patch('builtins.open', new_callable=mock_open()) as m:
             item = next(self.spider.parse_items(self.sports_response))
             # simple assertion that your open was called with append
-            file = os.path.join(os.getcwd(), 'news_crawler/spiders/url_visited.txt')
+            file = os.path.join(
+                os.getcwd(), 'news_crawler/spiders/url_visited.txt')
             m.assert_called_with(file, 'a')
             self.assertEqual(item['url'], 'http://www.example.com')
             self.assertEqual(item['author'], 'Shoaib Jatt')
-            self.assertEqual(item['posted_date'], datetime.datetime(2021, 5, 5))
+            self.assertEqual(item['posted_date'],
+                             datetime.datetime(2021, 5, 5))
             assert item['headline'] is not None

@@ -55,7 +55,9 @@ class NewsPlaceMentionedPipeline:
             places = list(set(extractor.places))
             adapter['places_mentioned'] = places
         except Exception:
-            raise DropItem('Failed to extract places mentioned in: ' + item['url'])
+            raise DropItem('Failed to extract '
+                           'places mentioned in: '
+                           + item['url'])
         return item
 
 

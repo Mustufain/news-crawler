@@ -14,7 +14,8 @@ SPIDER_MODULES = ['news_crawler.spiders']
 NEWSPIDER_MODULE = 'news_crawler.spiders'
 
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
+# Crawl responsibly by identifying yourself
+# (and your website) on the user-agent
 # USER_AGENT = 'news_crawler (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
@@ -40,7 +41,8 @@ COOKIES_ENABLED = False
 
 # Override the default request headers:
 # DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+#   'Accept': 'text/html,application/xhtml+xml,
+#   application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
 # }
 
@@ -85,7 +87,8 @@ ITEM_PIPELINES = {
 # AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
+# See https://docs.scrapy.org/en/latest/
+# topics/downloader-middleware.html#httpcache-middleware-settings
 # HTTPCACHE_ENABLED = True
 # HTTPCACHE_EXPIRATION_SECS = 0
 # HTTPCACHE_DIR = 'httpcache'

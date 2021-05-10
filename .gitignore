@@ -3,3 +3,4 @@
 *.pyc
 test/__pycache__
 news_crawler/__pycache__
+news_crawler/spiders/__pycache__
