@@ -8,14 +8,14 @@ WORKDIR /news-crawler
 COPY . /news-crawler
 
 # Install any needed packages specified in requirements.txt
-RUN yum install -y python36 python36-pip python36-devel.x86_64 mysql mysql-devel mysql-libs glibc-devel gcc gcc-c++ nano postgresql-devel git screen && \
+RUN yum install -y python36 python36-pip python36-devel.x86_64 glibc-devel gcc gcc-c++ git screen && \
     pip-3.6 install --upgrade pip && \
     pip install  -r requirements.txt && \
     pip install --upgrade awscli
 
 # Define environment variable
-ENV PYTHONPATH "${PYTHONPATH}:/news_crawler"
+ENV PYTHONPATH "${PYTHONPATH}:/news-crawler"
 
 # Run run.sh when the container launches
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["bash", "/news-crawler/run.sh"]
 

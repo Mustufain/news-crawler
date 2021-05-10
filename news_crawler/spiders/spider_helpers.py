@@ -51,10 +51,10 @@ def get_posted_date(soup_text):
     if time_tag:
         b_tag = time_tag.find('b')
         if b_tag:
-            posted_date_str = b_tag.text
+            posted_date_str = b_tag.text.strip()
             posted_date = parse_date(posted_date_str)
         else:
-            posted_date_str = time_tag.text
+            posted_date_str = time_tag.text.strip()
             posted_date = parse_date(posted_date_str)
         return posted_date
 
