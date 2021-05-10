@@ -1,7 +1,6 @@
 PROJECT_NAME=news-crawler
 DOCKER_REPO=$(PROJECT_NAME)
 DOCKER_TAG?=latest
-DOCKER_URL=633157335118.dkr.ecr.us-east-1.amazonaws.com
 
 .virtualenv:
 	virtualenv -p python3 .virtualenv
@@ -21,10 +20,6 @@ test: .virtualenv
 
 build-container:
 	docker build -t $(DOCKER_REPO) .
-
-publish: build
-	@docker tag $(DOCKER_REPO) $(DOCKER_URL)/$(DOCKER_REPO):$(DOCKER_TAG)
-	@docker push $(DOCKER_URL)/$(DOCKER_REPO):$(DOCKER_TAG)
 
 build: test clean build-container
 
