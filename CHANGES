@@ -1,6 +1,11 @@
-1.1.0.dev0
+1.2.0.dev0
 
     * FILL-ME-ON-RELEASE
+
+1.1.0
+
+    * Improve rules to speed up craawling process
+    * Limit 1000 items scraped per crawl
 
 1.0.0
 
