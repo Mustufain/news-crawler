@@ -30,8 +30,16 @@ def get_posted_date(time_tag: BeautifulSoup) -> datetime:
         date_str = time_tag.text.strip()
     # pymongo uses datetime.datetime objects
     # for representing dates in mongo docs
-    posted_date = datetime.datetime.strptime(
-        date_str, '%b %d, %Y')
+    # There are two date patterns:
+    # %b %d, %Y and %B %d, %Y
+    if len(date_str.split(' ')[0]) == 3:
+        # month is in short form (3 characters eg: Sep)
+        posted_date = datetime.datetime.strptime(
+            date_str, '%b %d, %Y')
+    else:
+        posted_date = datetime.datetime.strptime(
+            date_str, '%B %d, %Y')
+
     return posted_date
 
 

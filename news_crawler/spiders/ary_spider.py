@@ -13,7 +13,8 @@ class AryNewsSpider(CrawlSpider):
     rules = [Rule(
         LinkExtractor(
             allow=["arynews.tv/en/*",
-                   "https://arysports.tv/*"]  # only such urls
+                   "https://arysports.tv/*"],  # only such urls
+            deny=['/category', '/author', '/page']
         ),
         callback='parse_items',
         follow=True
@@ -25,7 +26,9 @@ class AryNewsSpider(CrawlSpider):
 
     def __init__(self):
 
-        self.start_urls = ['https://arynews.tv/en']
+        self.start_urls = ['https://arynews.tv/en', 'https://arysports.tv/']
+        self.allowed_domains = ["arynews.tv", "arysports.tv"]
+        self.urls_visited = get_visited_urls()
         super().__init__()
 
     def parse_items(self, response):
@@ -33,11 +36,10 @@ class AryNewsSpider(CrawlSpider):
 
         :param response:
         """
-        urls_visited = get_visited_urls()
         soup = BeautifulSoup(response.text, 'lxml')
         article_exists = is_article(soup)
         if article_exists:
-            if response.url not in urls_visited:
+            if response.url not in self.urls_visited:
                 # scrapping logic here
                 news_item = NewsItem()
                 news_item['url'] = response.url

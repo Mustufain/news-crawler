@@ -17,6 +17,8 @@ class SpiderHelpers(unittest.TestCase):
             fake_response('data/sports.html').text, 'lxml')
         self.invalid_soup = BeautifulSoup(
             fake_response('data/invalid_response.html').text, 'lxml')
+        self.invalid_sports_soup = BeautifulSoup(
+            fake_response('data/invalid_sports_text.html').text, 'lxml')
 
     def test_get_time_tag(self):
         news_time_tag = get_time_tag(self.news_soup)
@@ -34,6 +36,10 @@ class SpiderHelpers(unittest.TestCase):
 
         posted_date = get_posted_date(self.sports_soup.find('time'))
         self.assertEqual(posted_date, datetime.datetime(2021, 5, 5))
+
+    def test_get_sports_invalid_posted_date(self):
+        posted_date = get_posted_date(self.invalid_sports_soup.find('time'))
+        self.assertEqual(posted_date, datetime.datetime(2021, 1, 17))
 
     def test_get_news_headline(self):
         news_headline = get_news_headline(self.news_soup)
