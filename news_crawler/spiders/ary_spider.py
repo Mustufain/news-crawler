@@ -1,67 +1,80 @@
-from scrapy.spiders import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor
+from scrapy.spiders import CrawlSpider
+from scrapy import Request
 from bs4 import BeautifulSoup
 
 from news_crawler.items import NewsItem
 from news_crawler.spiders.spider_helpers import is_article, \
     get_posted_date, get_news_headline, get_news_author, \
-    get_time_tag, get_visited_urls
+    get_time_tag, extract_url, if_url_exists, get_next_url
 
 
 class AryNewsSpider(CrawlSpider):
     name = "ary"
-    rules = [Rule(
-        LinkExtractor(
-            allow=["arynews.tv/en/*",
-                   "https://arysports.tv/*"],  # only such urls
-            deny=['/category', '/author', '/page']
-        ),
-        callback='parse_items',
-        follow=True
-    )
-    ]
     custom_settings = {
         'LOG_LEVEL': 'INFO',
     }
 
-    def __init__(self):
+    def start_requests(self):
+        urls = ['https://arynews.tv/en/2017/05/10/',
+                'https://arysports.tv/2017/05/10/']
+        for url in urls:
+            yield Request(url=url, callback=self.parse)
 
-        self.start_urls = ['https://arynews.tv/en', 'https://arysports.tv/']
-        self.allowed_domains = ["arynews.tv", "arysports.tv"]
-        self.urls_visited = get_visited_urls()
-        super().__init__()
-
-    def parse_items(self, response):
+    def parse(self, response):
         """
 
         :param response:
         """
+        # here we receive the contents of the page:
+        # https://arysports.tv|arynews.tv/YYYY/MM/DD/
+        self.logger.info(response.url)
+        soup = BeautifulSoup(response.text, 'lxml')
+        page_urls = extract_url(soup, response.url)
+        if page_urls:
+            self.logger.info(page_urls)
+            for url in page_urls:
+                url_exists = if_url_exists(url)
+                if url_exists:
+                    self.logger.info('url already scraped: %s', url)
+                else:
+                    self.logger.info('processing url %s', url)
+                    yield Request(url, callback=self.parse_attr)
+            next_url = get_next_url(soup, response.url)
+            if next_url:
+                self.logger.info('next_url: %s', next_url)
+                yield Request(next_url, callback=self.parse)
+            else:
+                self.logger.info('scrapper reached at the end of page')
+        else:
+            self.logger.info('urls cannot be extracted')
+
+    def parse_attr(self, response):
+        """
+        parses each url
+        :param response:
+        :return:
+        """
         soup = BeautifulSoup(response.text, 'lxml')
         article_exists = is_article(soup)
         if article_exists:
-            if response.url not in self.urls_visited:
-                # scrapping logic here
-                news_item = NewsItem()
-                news_item['url'] = response.url
-                news_item['text'] = response.text
-                anchor_tag = get_news_author(soup)
-                time_tag = get_time_tag(soup)
-                title_tag = get_news_headline(soup)
-                # if anchor tag is found
-                if anchor_tag:
-                    news_item['author'] = anchor_tag.text
-                # if time tag is found
-                if time_tag:
-                    posted_date = get_posted_date(time_tag)
-                    news_item['posted_date'] = posted_date
-                # if title tag is found
-                if title_tag:
-                    news_item['headline'] = title_tag.text
-                yield news_item
-            else:
-                self.logger.info(
-                    'url %s has already been visited',
-                    response.url)
+            # scrapping logic here
+            news_item = NewsItem()
+            news_item['url'] = response.url
+            news_item['text'] = response.text
+            anchor_tag = get_news_author(soup)
+            time_tag = get_time_tag(soup)
+            title_tag = get_news_headline(soup)
+            # if anchor tag is found
+            if anchor_tag:
+                news_item['author'] = anchor_tag.text
+            # if time tag is found
+            if time_tag:
+                posted_date = get_posted_date(time_tag)
+                news_item['posted_date'] = posted_date
+            # if title tag is found
+            if title_tag:
+                news_item['headline'] = title_tag.text
+            yield news_item
         else:
             self.logger.info(
                 'url %s does not contain news post',

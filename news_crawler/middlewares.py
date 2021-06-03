@@ -5,9 +5,6 @@
 
 from scrapy import signals
 
-# useful for handling different item types with a single interface
-from itemadapter import is_item, ItemAdapter
-
 
 class NewsCrawlerSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -61,6 +58,9 @@ class NewsCrawlerDownloaderMiddleware:
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
 
+    # def __init__(self):
+    #    self.urls_visited = get_visited_urls()
+
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
@@ -78,6 +78,7 @@ class NewsCrawlerDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+
         return None
 
     def process_response(self, request, response, spider):
@@ -87,6 +88,7 @@ class NewsCrawlerDownloaderMiddleware:
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
+
         return response
 
     def process_exception(self, request, exception, spider):

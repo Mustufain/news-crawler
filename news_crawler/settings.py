@@ -1,4 +1,21 @@
 import urllib
+import boto3
+from botocore.exceptions import ClientError
+
+ssm = boto3.client('ssm', region_name='us-east-1')
+
+
+def get_ssm_parameter(name: str, with_decryption=False) -> str:
+    try:
+        response = ssm.get_parameter(
+            Name=name,
+            WithDecryption=with_decryption)
+        parameter = response['Parameter']['Value']
+    except ClientError as error:
+        print(error.response['Error']['Code'])
+        raise
+    return parameter
+
 # Scrapy settings for news_crawler project
 #
 # For simplicity, this file contains only settings considered important or
@@ -59,9 +76,9 @@ COOKIES_ENABLED = False
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'news_crawler.middlewares.NewsCrawlerDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+   'news_crawler.middlewares.NewsCrawlerDownloaderMiddleware': 120,
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -100,14 +117,17 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-# scraper will scrap at most 1000 news items in a day
+# scraper will scrap at most 200 news items in a day
 # An integer which specifies a number of items
-CLOSESPIDER_ITEMCOUNT = 1000
-
+# CLOSESPIDER_ITEMCOUNT = 100
+TELNETCONSOLE_PORT = None
 # MongoDB settings
 
-MONGODB_USERNAME = urllib.parse.quote_plus("mustufain")
-MONGODB_PWD = urllib.parse.quote_plus("mongo@!123")
+MONGODB_USERNAME = urllib.parse.quote_plus(
+    get_ssm_parameter('MONGODB_USERNAME'))
+MONGODB_PWD = urllib.parse.quote_plus(
+    get_ssm_parameter('MONGODB_PWD',
+                      with_decryption=True))
 MONGODB_URI = f"mongodb+srv://{MONGODB_USERNAME}:{MONGODB_PWD}" \
               f"@news-scraper.a2rmv.mongodb.net/" \
               f"ary_news?retryWrites=true&w=majority"
