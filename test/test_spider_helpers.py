@@ -4,7 +4,7 @@ import mock
 from bs4 import BeautifulSoup
 from news_crawler.spiders.spider_helpers import is_article, \
     get_posted_date, get_news_headline, \
-    get_time_tag, get_news_author, get_visited_urls
+    get_time_tag, get_news_author, if_url_exists
 from .utils import fake_response
 
 
@@ -71,6 +71,6 @@ class SpiderHelpers(unittest.TestCase):
         assert anchor_tag is None
 
     @mock.patch("pymongo.MongoClient")
-    def test_get_visited_urls(self, mock_pymongo):
-        get_visited_urls()
+    def test_if_url_exists(self, mock_pymongo):
+        if_url_exists('foo')
         self.assertTrue(mock_pymongo.called)

@@ -14,9 +14,16 @@ class AryNewsSpider(CrawlSpider):
         'LOG_LEVEL': 'INFO',
     }
 
+    def __init__(self, ds):
+        self.ds = ds
+
     def start_requests(self):
-        urls = ['https://arynews.tv/en/2017/05/10/',
-                'https://arysports.tv/2017/05/10/']
+        date_list = self.ds.split('-')
+        year = date_list[0]
+        month = date_list[1]
+        day = date_list[2]
+        urls = [f'https://arynews.tv/en/{year}/{month}/{day}/',
+                f'https://arysports.tv/{year}/{month}/{day}/']
         for url in urls:
             yield Request(url=url, callback=self.parse)
 
