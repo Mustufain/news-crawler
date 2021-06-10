@@ -3,7 +3,7 @@ DOCKER_REPO=$(PROJECT_NAME)
 DOCKER_TAG?=latest
 
 .virtualenv:
-	virtualenv -p python3.7 .virtualenv
+	virtualenv -p python3 .virtualenv
 	. .virtualenv/bin/activate; \
 	pip install -r requirements.txt
 
