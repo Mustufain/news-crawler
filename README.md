@@ -51,6 +51,6 @@ To run locally:
 3. ```make run-local ds=YYYY-MM-dd```
 
 If ```make run-local ds=YYY-MM-DD``` fails, do ```make clean``` and then run it again.
-The results will be crawledcl and posted to mongodb database
+The results will be crawled and posted to mongodb database
 
 Crawler would scrap all the news articles posted on ```ds```
