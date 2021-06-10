@@ -45,8 +45,12 @@ def get_ssm_parameter(name: str, with_decryption=False) -> str:
 # Usage
 
 To run locally: 
-1. ```export PYTHONPATH=/path/to/news_crawler```
-2. ```make run-local ds=YYYY-MM-dd```
+
+1. Create virtual env of python 3.6 ```pyenv virtualenv 3.6.1 <your-virtual-env>```
+2. ```export PYTHONPATH=/path/to/news_crawler```
+3. ```make run-local ds=YYYY-MM-dd```
 
 If ```make run-local ds=YYY-MM-DD``` fails, do ```make clean``` and then run it again.
 The results will be crawledcl and posted to mongodb database
+
+Crawler would scrap all the news articles posted on ```ds```
