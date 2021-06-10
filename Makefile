@@ -25,6 +25,6 @@ build: test clean build-container
 
 run-local: .virtualenv
 	. .virtualenv/bin/activate; \
-	. ./run.sh
+	. ./run.sh $(ds)
 
 .PHONY: test clean build-container publish build run-local
