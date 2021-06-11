@@ -6,7 +6,7 @@ from news_crawler.items import NewsItem
 from news_crawler.pipelines import NewsTextPipeline, \
     NewsPlaceMentionedPipeline, DropEmptyRequiredFieldsPipeline, \
     DuplicatesPipeline, MongoPipeline
-from .utils import fake_response, read_file
+from .utils import fake_response
 
 
 class NewsTextPipelineTest(unittest.TestCase):
@@ -15,19 +15,27 @@ class NewsTextPipelineTest(unittest.TestCase):
         self.spider = Spider(name='spider')
         self.news_response = fake_response("data/news.html")
         self.sports_response = fake_response('data/sports.html')
+        self.recent_news_response = fake_response('data/recent_news.html')
+        self.recent_sports_response = fake_response('data/recent_sports.html')
         self.pipeline = NewsTextPipeline()
         self.item = NewsItem()
 
     def test_process_item(self):
         self.item['text'] = self.news_response.text
         news = self.pipeline.process_item(self.item, self.spider)
-        text = read_file('data/news_text.txt')
-        self.assertEqual(news['text'], text)
+        self.assertIsNotNone(news['text'])
 
         self.item['text'] = self.sports_response.text
         sports = self.pipeline.process_item(self.item, self.spider)
-        text = read_file('data/sports_text.txt')
-        self.assertEqual(sports['text'], text)
+        self.assertIsNotNone(sports['text'])
+
+        self.item['text'] = self.recent_news_response.text
+        news = self.pipeline.process_item(self.item, self.spider)
+        self.assertIsNotNone(news['text'])
+
+        self.item['text'] = self.recent_sports_response.text
+        sports = self.pipeline.process_item(self.item, self.spider)
+        self.assertIsNotNone(sports['text'])
 
 
 class NewsPlaceMentionedPipelineTest(unittest.TestCase):

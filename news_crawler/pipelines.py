@@ -2,9 +2,8 @@ import logging
 import pymongo
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
-from readability import Document
 from geograpy import extraction
-import html2text
+from bs4 import BeautifulSoup
 
 
 class NewsTextPipeline:
@@ -15,21 +14,15 @@ class NewsTextPipeline:
     def process_item(self, item, spider):
         try:
             adapter = ItemAdapter(item)
-            doc = Document(adapter['text'])
-            content = Document(doc.content()).summary()
-            html_text = html2text.HTML2Text()
-            html_text.ignore_links = True
-            html_text.ignore_images = True
-            news_text = html_text.handle(content)
+            soup_text = BeautifulSoup(adapter['text'], "lxml")
+            news_text = soup_text.find('article').text
             news_text = news_text.replace("\\n", " ").\
                 replace("\n", " ").\
                 replace("\r", " ").\
-                replace("\r\n", " ").\
-                replace("**", "").\
-                replace("#", "").strip()
+                replace("\r\n", " ").strip()
             news_text = " ".join(news_text.split())
             adapter['text'] = news_text
-        except Exception:
+        except Exception as e:
             raise DropItem('Failed to extract news text from: ' + item['url'])
         return item
 
