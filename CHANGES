@@ -1,6 +1,10 @@
-1.3.0.dev0
+1.4.0.dev0
 
     * FILL-ME-ON-RELEASE
+
+1.3.0
+
+    * Text extraction logic changed to use beautiful soup to improve data quality
 
 1.2.0
 
