@@ -54,3 +54,7 @@ If ```make run-local ds=YYY-MM-DD``` fails, do ```make clean``` and then run it 
 The results will be crawled and posted to mongodb database
 
 Crawler would scrap all the news articles posted on ```ds```
+
+# Architecture
+
+![Alt text](images/crawler-architecture.png?raw=true "News Crawler")
